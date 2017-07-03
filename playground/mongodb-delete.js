@@ -34,6 +34,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
   //   console.log('Unable to delete that document', err);
   // });
 
+<<<<<<< HEAD
   // db.collection('Users').findOneAndDelete({
   //   _id: new ObjectID("595290f6158541078dc83a71")
   // }).then((result) => {
@@ -41,6 +42,15 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
   // }, (err) => {
   //   console.log('Unable to delete that document', err);
   // })
+=======
+  db.collection('Users').findOneAndDelete({
+    _id: new ObjectID("595290f6158541078dc83a71")
+  }).then((result) => {
+    console.log(result);
+  }, (err) => {
+    console.log('Unable to delete that document', err);
+  })
+>>>>>>> 7f0e844f44106973e58b72de49fbf363604e95ee
 
   // db.close();
 });
