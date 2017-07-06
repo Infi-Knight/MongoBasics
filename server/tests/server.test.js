@@ -52,8 +52,11 @@ describe('# POST /todos', () => {
         return done(err);
       }
 
-      // there should be no todo in the database
+      // there should be no todos in the database
+      // because beforeEach() flushes database before running
+      // a test case
       Todo.find({}).then((todos) => {
+        // No of todos = zero
         expect(todos.length).toBe(0);
         done();
       }).catch((e) => done(e));
