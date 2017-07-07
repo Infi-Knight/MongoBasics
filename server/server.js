@@ -21,6 +21,16 @@ app.post('/todos', (req, res) => {
   });
 });
 
+app.get('/todos', (req, res) => {
+  Todo.find().then((todos) => {
+    // The array we recieved isn't flexible
+    // so we send an object
+    res.send({todos})
+  }, (err) => {
+    res.status(400).send(err);
+  })
+});
+
 app.listen(3000, () => {
   console.log('Server up and running on port 3000');
 });

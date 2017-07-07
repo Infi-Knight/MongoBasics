@@ -4,9 +4,13 @@ const request = require('supertest');
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
-// flush the database before running test cases:
+const dummy = [{text: 'Learn react'}, {text: 'GOT july 18'}, {text: 'Blah'}];
+
+// flush the database before running test cases and sedd it with dummy
 beforeEach((done) => {
-  Todo.remove({}).then(() => done());
+  Todo.remove({}).then(() => {
+    return Todo.insertMany(dummy);
+  }).then(() => done());
 });
 
 describe('# POST /todos', () => {
@@ -29,7 +33,7 @@ describe('# POST /todos', () => {
         }
         // if we get a valid response check if the database was
         // successfully updated
-        Todo.find().then((todos) => {
+        Todo.find({text}).then((todos) => {
           // one todo should have been added to database
           expect(todos.length).toBe(1);
           expect(todos[0].text).toBe(text);
@@ -57,9 +61,21 @@ describe('# POST /todos', () => {
       // a test case
       Todo.find({}).then((todos) => {
         // No of todos = zero
-        expect(todos.length).toBe(0);
+        expect(todos.length).toBe(3);
         done();
       }).catch((e) => done(e));
     });
+  });
+});
+
+describe('# GET /todos', () => {
+  it('should read all the todos', (done) => {
+    request(app)
+      .get('/todos')
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todos.length).toBe(3);
+      })
+      .end(done);
   });
 });
