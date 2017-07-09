@@ -20,7 +20,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
   }
   console.log('Connected to mongodb server');
 
-  create a Todos collection
+  // create a Todos collection
   db.collection('Todos').insertOne({
     text: 'Kill the task',
     completed: false
@@ -28,7 +28,7 @@ MongoClient.connect('mongodb://localhost:27017/TodoApp', (err, db) => {
     if (err) {
       return console.log('Unable to insert the todo', err);
     }
-  
+
   // result.ops is an array of all the documents that were inserted
     console.log(JSON.stringify(result.ops, undefined, 2));
   });

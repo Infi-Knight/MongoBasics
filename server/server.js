@@ -22,13 +22,25 @@ app.post('/todos', (req, res) => {
 });
 
 app.get('/todos', (req, res) => {
-  Todo.find().then((todos) => {
+  Todo.find({}).then((todos) => {
     // The array we recieved isn't flexible
     // so we send an object
     res.send({todos})
   }, (err) => {
     res.status(400).send(err);
-  })
+  });
+});
+
+app.post('/users', (req, res) => {
+  var user = new User({
+    email: req.body.email
+  });
+
+  user.save().then((doc) => {
+    res.send(doc)
+  }, (err) => {
+    res.status.send(err);
+  });
 });
 
 app.listen(3000, () => {
