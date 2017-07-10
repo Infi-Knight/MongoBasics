@@ -1,10 +1,15 @@
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
 
-const dummy = [{text: 'Learn react'}, {text: 'GOT july 18'}, {text: 'Blah'}];
+const dummy = [
+                {text: 'Learn react', _id: new ObjectID()},
+                {text: 'GOT july 18', _id: new ObjectID()},
+                {text: 'Blah', _id: new ObjectID()}
+              ];
 
 // flush the database before running test cases and sedd it with dummy
 beforeEach((done) => {
@@ -76,6 +81,34 @@ describe('# GET /todos', () => {
       .expect((res) => {
         expect(res.body.todos.length).toBe(3);
       })
+      .end(done);
+  });
+});
+
+describe('# GET /todos/:id', () => {
+  it ('should return todo doc', (done) => {
+    request(app)
+      .get(`/todos/${dummy[0]._id.toHexString()}`)
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(dummy[0].text);
+      })
+      .end(done);
+  });
+
+  it ('should return 404 if no todo is found', (done) => {
+    var non_existing = new ObjectID();
+    request(app)
+      .get(`/todos/${non_existing.toHexString()}`)
+      // .get(`/todos/${dummy[0]._id.toHexString()}`)  // this line will cause the test to fail
+      .expect(404)
+      .end(done);
+  });
+
+  it ('should return 404 for invalid id', (done) => {
+    request(app)
+      .get('/todos/123abc')
+      .expect(404)
       .end(done);
   });
 });
