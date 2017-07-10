@@ -6,6 +6,8 @@ var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
 
+const port = process.env.PORT || 3000;
+
 var app = express();
 // setup the body-parser middleware which will attach body to req object
 app.use(bodyParser.json());
@@ -64,8 +66,8 @@ app.get('/todos/:id', (req, res) => {
   });
 });
 
-app.listen(3000, () => {
-  console.log('Server up and running on port 3000');
+app.listen(port, process.env.IP, () => {
+  console.log(`Server up and running on port ${port}`);
 });
 
 // we will use this export for testing purposes
