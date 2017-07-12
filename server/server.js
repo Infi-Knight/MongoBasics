@@ -1,10 +1,11 @@
-var express = require('express');
-var bodyParser = require('body-parser');
+const express = require('express');
+const bodyParser = require('body-parser');
+const _ = require('lodash');
 
-var {ObjectID} = require('mongodb');
-var {mongoose} = require('./db/mongoose');
-var {Todo} = require('./models/todo');
-var {User} = require('./models/user');
+const {ObjectID} = require('mongodb');
+const {mongoose} = require('./db/mongoose');
+const {Todo} = require('./models/todo');
+const {User} = require('./models/user');
 
 const port = process.env.PORT || 3000;
 
@@ -83,6 +84,35 @@ app.delete('/todos/:id', (req, res) => {
   }).catch((e) => {
     res.status(400).send('Internal server error');
   });
+});
+
+app.patch('/todos/:id', (req, res) => {
+  var id = req.params.id;
+  // We don't want users to update anything they want
+  var body = _.pick(req.body, ['text', 'completed']);
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send('Invalid ID');
+  }
+
+  // If a todo has been completed
+  if (_.isBoolean(body.completed) && body.completed) {
+    body.completedAt = new Date().getTime();
+  } else {
+    body.completed = false;
+    body.completedAt = null;
+  }
+
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true})
+    .then((todo) => {
+      if (!todo) {
+        return res.status(404).send('No todo for that id');
+      }
+
+      res.send({todo});
+    }).catch((e) => {
+      res.status(400).send('Internal server error');
+    });
 });
 
 app.listen(port, process.env.IP, () => {
