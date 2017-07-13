@@ -174,7 +174,45 @@ describe('# PATCH /todos/:id', () => {
       .end(done);
   });
 
-  // it ('should clear completedAt when todo is not completed', (done) => {
+  it ('should clear completedAt when todo is not completed', (done) => {
+    var hexId = dummy[1]._id.toHexString();
+    var text = 'Update from the test suite';
 
-  // });
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        completed: false,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(text);
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.completedAt).toNotExist();
+      })
+      .end(done);
+  });
+
+  it ('should return 404 if todo was not found', (done) => {
+    var non_existing = new ObjectID();
+    request(app)
+      .patch(`/todos/${non_existing}`)
+      .send({
+        text: 'Pakistan sucks',
+        completed: 'true'
+      })
+      .expect(404)
+      .end(done);
+  });
+
+  it ('should return 404 if a invalid ObjectID is requested', (done) => {
+    request(app)
+      .patch('/todos/123')
+      .send({
+        text: 'Express rocks',
+        completed: 'false'
+      })
+      .expect(404)
+      .end(done);
+  });
 });
