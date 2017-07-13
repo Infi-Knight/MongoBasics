@@ -8,7 +8,7 @@ const {Todo} = require('./../models/todo');
 const dummy = [
                 {text: 'Learn react', _id: new ObjectID()},
                 {text: 'GOT july 18', _id: new ObjectID()},
-                {text: 'Blah', _id: new ObjectID()}
+                {text: 'Blah', _id: new ObjectID(), completed: true, completedAt: 444}
               ];
 
 // flush the database before running test cases and sedd it with dummy
@@ -152,4 +152,29 @@ describe('# DELETE /todos/:id', () => {
       .expect(404)
       .end(done);
   });
+});
+
+describe('# PATCH /todos/:id', () => {
+  it('should update the todo', (done) => {
+    var hexId = dummy[0]._id.toHexString();
+    var text = 'This should be the new text';
+
+    request(app)
+      .patch(`/todos/${hexId}`)
+      .send({
+        completed: true,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(text);
+        expect(res.body.todo.completed).toBe(true);
+        expect(res.body.todo.completedAt).toBeA('number');
+      })
+      .end(done);
+  });
+
+  // it ('should clear completedAt when todo is not completed', (done) => {
+
+  // });
 });
