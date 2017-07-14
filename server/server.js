@@ -1,4 +1,4 @@
-require('./config/conifg.js');
+require('./config/config');
 
 const _ = require('lodash');
 const express = require('express');
@@ -34,18 +34,6 @@ app.get('/todos', (req, res) => {
     res.send({todos})
   }, (err) => {
     res.status(400).send(err);
-  });
-});
-
-app.post('/users', (req, res) => {
-  var user = new User({
-    email: req.body.email
-  });
-
-  user.save().then((doc) => {
-    res.send(doc)
-  }, (err) => {
-    res.status.send(err);
   });
 });
 
@@ -112,6 +100,19 @@ app.patch('/todos/:id', (req, res) => {
   }).catch((e) => {
     res.status(400).send();
   })
+});
+
+
+// POST /users
+app.post('/users', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+  var user = new User(body);
+
+  user.save().then((user) => {
+    res.send(user);
+  }).catch((e) => {
+    res.status(400).send(e);
+  });
 });
 
 app.listen(port, process.env.IP, () => {
