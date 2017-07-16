@@ -106,15 +106,33 @@ app.patch('/todos/:id', (req, res) => {
 // POST /users
 app.post('/users', (req, res) => {
   var body = _.pick(req.body, ['email', 'password']);
+  // Create a new instance from our User Schema
   var user = new User(body);
 
   user.save().then(() => {
+    // user.generateAuthToken() will return a promise to a token
     return user.generateAuthToken();
   }).then((token) => {
+    // create a custom auth header
     res.header('x-auth', token).send(user);
   }).catch((e) => {
     res.status(400).send(e);
   })
+});
+
+app.get('/users/me', (req, res) => {
+  var token = req.header('x-auth');
+
+  User.findByToken(token).then((user) => {
+    if (!user) {
+      return Promise.reject();
+    }
+
+    res.send(user);
+  }).catch((e) => {
+    // send a 401 i.e authentication required
+    res.status(401).send('authentication failed');
+  });
 });
 
 app.listen(port, process.env.IP, () => {

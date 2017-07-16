@@ -56,6 +56,32 @@ UserSchema.methods.generateAuthToken = function () {
   });
 };
 
+// UserSchema.statics creates a model method rather than an instance method
+UserSchema.statics.findByToken = function (token) {
+  var User = this;
+  var decoded;
+
+  try {
+    decoded = jwt.verify(token, 'abc123');
+  } catch (e) {
+    // // jwt throws an error if the authtoken was not valid
+    // // so if we reach this point we know that something is not wrong
+    // // hence we will send a promise with a reject clause which will
+    // // cause the catch call in server js to run instead of the promise being resolved
+    // return new Promise ((resolve, reject) => {
+    //   reject();
+    // });
+    return Promise.reject();
+  }
+
+  // return a promise
+  return User.findOne ({
+    '_id': decoded._id,
+    'tokens.token': token,
+    'tokens.access': 'auth'
+  });
+};
+
 var User = mongoose.model('User', UserSchema);
 
 module.exports = {User};
