@@ -4,19 +4,11 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
+const {dummy, populateTodos, users, populateUsers} = require('./seed/seed');
 
-const dummy = [
-                {text: 'Learn react', _id: new ObjectID()},
-                {text: 'GOT july 18', _id: new ObjectID()},
-                {text: 'Blah', _id: new ObjectID(), completed: true, completedAt: 444}
-              ];
-
-// flush the database before running test cases and sedd it with dummy
-beforeEach((done) => {
-  Todo.remove({}).then(() => {
-    return Todo.insertMany(dummy);
-  }).then(() => done());
-});
+// flush the database before running test cases and seed it with test data
+beforeEach(populateUsers);
+beforeEach(populateTodos);
 
 describe('# POST /todos', () => {
   it('should create a new Todo', (done) => {
