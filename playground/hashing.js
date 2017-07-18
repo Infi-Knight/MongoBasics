@@ -1,17 +1,37 @@
 const {SHA256} = require('crypto-js');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-var data = {
-	id: 5
-}
+var password = '123abc!';
 
-// jwt.token() takes data to be hashed along with a salt and creates a token
-var token = jwt.sign(data, '123abc');
-console.log(token);
+// Generate a salt using bcrypt algo. 
+// The higher the number of rounds slow is the salt generation. This can be useful 
+// to prevent the brute force attacks. 
+// This salt generation is async function
+// bcrypt.genSalt(10, (err, salt) => {
+// 	// Now hash our data (password)
+// 	bcrypt.hash(password, salt, (err, hash) => {
+// 		console.log(hash);
+// 	});
+// });
 
-// verify your token
-var decoded = jwt.verify(token, '123abc');
-console.log(decoded);
+var hashedPassword = '$2a$10$z92PN3J9ufvQVtY3.Dkn.ONOfbsRiz.4nKa5NrFMPjuNm0itGWP2O';
+bcrypt.compare(password, hashedPassword, (err, result) => {
+	console.log(result);
+});
+
+
+// var data = {
+// 	id: 5
+// }
+
+// // jwt.token() takes data to be hashed along with a salt and creates a token
+// var token = jwt.sign(data, '123abc');
+// console.log(token);
+
+// // verify your token
+// var decoded = jwt.verify(token, '123abc');
+// console.log(decoded);
 
 // var message = 'Duos mas Duos egual a quartro';
 // var hash = SHA256(message).toString();
