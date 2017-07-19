@@ -4,6 +4,7 @@ const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Todo} = require('./../models/todo');
+var {User} = require('./../models/user');
 const {dummy, populateTodos, users, populateUsers} = require('./seed/seed');
 
 // flush the database before running test cases and seed it with test data
@@ -205,6 +206,77 @@ describe('# PATCH /todos/:id', () => {
         completed: 'false'
       })
       .expect(404)
+      .end(done);
+  });
+});
+
+describe('# GET /users/me', () => {
+  it ('should return a user if authenticated', (done) => {
+    request(app)
+      .get('/users/me')
+      .set('x-auth', users[0].tokens[0].token)  // Setting headers in supertest
+      .expect(200)
+      .expect((res) => {
+        expect(res.body._id).toBe(users[0]._id.toHexString());
+        expect(res.body.email).toBe(users[0].email);
+      }).end(done);
+  });
+
+  it ('should return 401 if not authenticated', (done) => {
+    request(app)
+      .get('/users/me')
+      .expect(401)
+      .expect((res) => {
+        expect(res.body).toEqual({});
+      }).end(done);
+  });
+})
+
+describe('# POST /users/', () => {
+  it ('should create a user when valid data is passed', (done) => {
+    var email = 'Pakistan@sucks.com';
+    var password = 'boisplayedwell';
+
+    request(app)
+      .post('/users')
+      .send({email, password})
+      .expect(200)
+      .expect((res) => {
+        expect(res.headers['x-auth']).toExist();  // We can't use dot notation here because of the hyphen
+        expect(res.body._id).toExist();
+        expect(res.body.email).toBe(email);
+      })
+      .end((err) => {
+        if (err) {
+          return done(err);
+        }
+
+        User.findOne({email}).then((user) => {
+          expect(user).toExist();
+          // plain text password should not be equal to the hashed password
+          expect(user.password).toNotBe(password);
+          done();
+        });
+      });
+  });
+
+  it ('should return validation error if invalid data passed', (done) => {
+    var badEmail = 'despacito.com';
+    request(app)
+      .post('/users')
+      .send({badEmail})
+      .expect(400)
+      .end(done);
+  });
+
+  it ('should not create user if email in use', (done) => {
+    request(app)
+      .post('/users')
+      .send({
+        email: users[0].email,
+        password: 'password'
+      })
+      .expect(400)
       .end(done);
   });
 });

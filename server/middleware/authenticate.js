@@ -13,7 +13,7 @@ var authenticate = (req, res, next) => {
     next();
   }).catch((e) => {
     // send a 401 i.e authentication required
-    res.status(401).send('authentication failed');
+    res.status(401).send();
   });
 };
 
