@@ -83,6 +83,30 @@ UserSchema.statics.findByToken = function (token) {
   });
 };
 
+// Find a user tryin to login using his login credentials
+UserSchema.statics.findByCredentials = function (email, password) {
+  var User = this;
+
+  // first verify email then check for password, remember we don't have a plain text password in the database
+  return User.findOne({email}).then((user) => {
+    if (!user) {
+      // This will trigger the catch call in server.js
+      return Promise.reject();
+    }
+
+    // bcrypt library does not support promised so we will wrap the callback in a promise
+    return new Promise((resolve, reject) => {
+      bcrypt.compare(password, user.password, (err, res) => {
+        if (res) {
+          resolve(user);
+        } else {
+          reject();
+        }
+      });
+    });
+  });
+};
+
 // Mongoose middleware to run before the 'save' event
 UserSchema.pre('save', function(next) {
   var user = this;

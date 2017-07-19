@@ -121,6 +121,20 @@ app.post('/users', (req, res) => {
   })
 });
 
+// LOGIN: POST /user/login {emai, password}
+app.post('/users/login', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+
+  User.findByCredentials(body.email, body.password).then((user) => {
+    // keep the chain alive by using return
+    return user.generateAuthToken().then((token) => {
+      res.header('x-auth', token).send(user);
+    });
+  }).catch((err) => {
+    res.status(400).send();
+  });
+});
+
 // Private route
 app.get('/users/me', authenticate, (req, res) => {
   res.send(req.user);
