@@ -83,6 +83,17 @@ UserSchema.statics.findByToken = function (token) {
   });
 };
 
+UserSchema.methods.removeToken = function(token) {
+  // pull lets you remove item from an array which match a certain criterai
+  var user = this;
+
+  return user.update({
+    $pull: {
+      tokens: {token}
+    }
+  })
+};
+
 // Find a user tryin to login using his login credentials
 UserSchema.statics.findByCredentials = function (email, password) {
   var User = this;
