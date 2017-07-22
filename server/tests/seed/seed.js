@@ -19,14 +19,17 @@ const users = [
                 {
                   _id: userTwoId,
                   email: 'rahul@miet.ac.in',
-                  password: 'blahblah'
+                  password: 'blahblah',
+                  tokens: [{
+                    access: 'auth',
+                    token: jwt.sign({_id: userTwoId, access: 'auth'}, 'abc123').toString()
+                  }]
                 }
               ]
 
 const dummy = [
-                {text: 'Learn react', _id: new ObjectID()},
-                {text: 'GOT july 18', _id: new ObjectID()},
-                {text: 'Blah', _id: new ObjectID(), completed: true, completedAt: 444}
+                {text: 'Learn react', _id: new ObjectID(), _creator: userOneId},
+                {text: 'Blah', _id: new ObjectID(), completed: true, completedAt: 444, _creator: userTwoId}
               ];
 
 const populateTodos = (done) => {
